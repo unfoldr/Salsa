@@ -33,8 +33,8 @@ namespace Generator
         /// </summary>
         private Dictionary<string, long> _uniqueIds = new Dictionary<string, long>();
 
-        private int _typeCodeMaxValue = 8; // Leave first 7 codes available for primitive types
-        private int _typeCodeValue = 0;
+        private int _typeCodeMaxValue = 16;
+        private int _typeCodeValue = 7; // Leave first 7 codes available for primitive types
 
         /// <summary>
         /// Set of types that are required by the types generated so far.
@@ -72,15 +72,20 @@ namespace Generator
         /// </summary>
         private string GetNextTypeCode()
         {
+            const int encodingBase = 16;
+
             // Build a string for type code (as a Haskell type)
             StringBuilder s = new StringBuilder();
             int x = _typeCodeValue;
             int b = _typeCodeMaxValue;
             while (b > 1)
             {
-                s.AppendFormat("{0} ::: ", x % 2 == 0 ? "TFalse" : "TTrue");
-                x /= 2;
-                b /= 2; 
+                s.AppendFormat("{0} ::: ", 
+                    new string[] { 
+                        "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", 
+                        "D8", "D9", "DA", "DB", "DC", "DD", "DE", "DF" }[x % encodingBase]);
+                x /= encodingBase;
+                b /= encodingBase; 
             }
             s.Append("TNil");
 
@@ -89,7 +94,7 @@ namespace Generator
             if (_typeCodeValue == _typeCodeMaxValue)
             {
                 _typeCodeValue = 0;
-                _typeCodeMaxValue *= 2;
+                _typeCodeMaxValue *= encodingBase;
             }
 
             return s.ToString();
@@ -340,7 +345,9 @@ namespace Generator
                         if (!IsMemberRequested(targetType, Sequence.First(mg).Name)) continue;
 
                         w.WriteLine("-- " + mg.Key);
+
                         WriteMethodGroup(mg, targetType);
+                        // SHOULD BE: WriteMethodGroup(mg, targetType);
                     }
                 }
 

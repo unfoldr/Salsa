@@ -40,18 +40,18 @@ type instance  IsRef t = TNot (IsPrim t)
 --   of labels used to represent .NET types.
 type family TyCode t
 
-type instance TyCode Int32              =            TFalse ::: TNil
-type instance TyCode String             =            TTrue  ::: TNil
-type instance TyCode Bool               = TFalse ::: TFalse ::: TNil
-type instance TyCode Double             = TFalse ::: TTrue  ::: TNil
-type instance TyCode (Obj Null)         = TTrue  ::: TFalse ::: TNil
-type instance TyCode (Maybe Bool)       = TTrue  ::: TTrue  ::: TNil -- Temporary HACK
+type instance TyCode Int32              = D0 ::: TNil
+type instance TyCode String             = D1 ::: TNil
+type instance TyCode Bool               = D2 ::: TNil
+type instance TyCode Double             = D3 ::: TNil
+type instance TyCode (Obj Null)         = D4 ::: TNil
+type instance TyCode (Maybe Bool)       = D5 ::: TNil -- Temporary HACK
 
 
 -- | 'TyEq t1 t2' is true iff the types @t1@ and @t2@ are the same .NET type
 --   (as indicated by their code).
 type family TyEq t1 t2
-type instance TyEq t1 t2 = ListEq (TyCode t1) (TyCode t2)
+type instance TyEq t1 t2 = DigitsEq (TyCode t1) (TyCode t2)
 
 -- | 'MemberEq m n' is true iff the members 'm' and 'n' have the same types.
 type family MemberEq m n
