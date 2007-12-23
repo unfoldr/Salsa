@@ -49,7 +49,7 @@ startCLR = do
 
 stopCLR :: IO ()
 stopCLR = do
-    saveDynamicAssembly
+    --saveDynamicAssembly -- (for debugging)
     stop_ICLRRuntimeHost clrHost
     return ()
 
