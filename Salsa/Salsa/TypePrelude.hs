@@ -35,6 +35,18 @@ type family If c a b
 type instance If TTrue  a b = a
 type instance If TFalse a b = b
 
+--type family TAnd3 x y z
+--type instance TAnd3 TFalse y      z = TFalse
+--type instance TAnd3 TTrue  TFalse z = TFalse
+--type instance TAnd3 TTrue  TTrue  z = z
+
+--type family TOr5 a b c d e
+--type instance TOr5 TTrue  b      c      d      e = TTrue
+--type instance TOr5 TFalse TTrue  c      d      e = TTrue
+--type instance TOr5 TFalse TFalse TTrue  d      e = TTrue
+--type instance TOr5 TFalse TFalse TFalse TTrue  e = TTrue
+--type instance TOr5 TFalse TFalse TFalse TFalse e = e
+
 --
 -- Type-level lists and associated operations:
 --

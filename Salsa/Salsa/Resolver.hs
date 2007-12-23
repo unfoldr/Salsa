@@ -53,6 +53,7 @@ type instance TyCode (Maybe Bool)       = D5 ::: TNil -- Temporary HACK
 type family TyEq t1 t2
 type instance TyEq t1 t2 = DigitsEq (TyCode t1) (TyCode t2)
 
+
 -- | 'MemberEq m n' is true iff the members 'm' and 'n' have the same types.
 type family MemberEq m n
 type instance MemberEq TNil       TNil       = TTrue
@@ -82,8 +83,12 @@ type instance  TyElem t1 (t ::: ts)  = TOr (TyEq t1 t) (TyElem t1 ts)
 --         where applicables = filterApplicables as ms
 --
 type family ResolveMember as ms
-type instance ResolveMember as ms = 
-    FromSingleton (Error NoMatch) (FilterBestMembers as (FilterApp as ms) (FilterApp as ms))
+type instance ResolveMember as ms = ResolveMember' as (FilterApp as ms)
+-- was: FromSingleton (Error NoMatch) (FilterBestMembers as (FilterApp as ms) (FilterApp as ms))
+
+type family ResolveMember' as fa
+type instance ResolveMember' as fa = FromSingleton (Error NoMatch) (FilterBestMembers as fa fa)
+
 
 data Error x
 data NoMatch
@@ -98,9 +103,13 @@ data NoMatch
 --
 type family FilterBestMembers as ms ns
 type instance FilterBestMembers as ms TNil       = TNil
-type instance FilterBestMembers as ms (n ::: ns) =
-    If (IsBestMember as ms n) (n ::: (FilterBestMembers as ms ns))
-                              (FilterBestMembers as ms ns)
+type instance FilterBestMembers as ms (n ::: ns) = FilterBestMembers' as ms n (FilterBestMembers as ms ns)
+-- was: If (IsBestMember as ms n) (n ::: (FilterBestMembers as ms ns))
+--                                (FilterBestMembers as ms ns)
+
+type family FilterBestMembers' as ms n fbms
+type instance FilterBestMembers' as ms n fbms = If (IsBestMember as ms n) (n ::: fbms) fbms
+
 
 -- | @'IsBestMember' as ms n@ is true iff the member @n@ is better than all
 --   the (other) members in @ms@ with respect to the argument list @as@. 
@@ -122,9 +131,14 @@ type instance IsBestMember as (m ::: ms) n =
 --   applicable with respect to the argument list @as@.
 type family    FilterApp  as  ms
 type instance  FilterApp  as  TNil        = TNil
-type instance  FilterApp  as  (m ::: ms)  = 
-    If (IsApp as m) (m ::: FilterApp as ms)
-                    (FilterApp as ms)
+type instance  FilterApp  as  (m ::: ms)  = FilterApp' as m (FilterApp as ms)
+-- was: If (IsApp as m) (m ::: FilterApp as ms)
+--                      (FilterApp as ms)
+
+-- Note: use of FilterApp' increases compilation speed by a factor of 10 (!)
+type family    FilterApp' as m fas
+type instance  FilterApp' as m fas = If (IsApp as m) (m ::: fas) fas
+
 
 -- | @'IsApp' as ps@ is true iff the function member defined by the 
 --   parameters @ps@ is applicable with respect to the argument list @as@
@@ -173,6 +187,14 @@ type instance  ConvertsTo t1 t2 =
     (TOr  (TAnd (TyEq t1 (Obj Null))  (IsRef t2))
           (TAnd (TAnd (IsRef t1) (IsRef t2))
                 (IsSubtypeOf t1 t2))))))
+
+--    (TOr5 (TyEq t1 t2)
+--          (TAnd (IsPrim t1)           (TyEq t2 (Obj Object_)))
+--          (TAnd (TyEq t1 Int32)       (TyEq t2 Double))
+--          (TAnd (TyEq t1 (Obj Null))  (IsRef t2))
+--          (TAnd3 (IsRef t1) (IsRef t2) (IsSubtypeOf t1 t2)))
+-- Note: using TOr5 instead of a nested set of TOr's only gives a small performance improvement.
+
 
 type family    IsSubtypeOf t1 t2
 type instance  IsSubtypeOf t1 t2  = 
