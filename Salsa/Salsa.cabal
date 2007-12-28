@@ -1,0 +1,19 @@
+Name:           Salsa
+Version:        1.0.0
+Cabal-Version:  >= 1.2
+License:        BSD3
+License-File:   LICENSE.txt
+Author:         Andrew Appleyard
+Category:       Foreign
+Synopsis:       A .NET Bridge for Haskell
+Build-Type:     Simple
+
+Library
+  Build-Depends: base, Win32, bytestring
+  Exposed-modules:
+    Salsa, Salsa.Binding
+  Other-Modules:
+    Salsa.CLR, Salsa.CLRHost, Salsa.Common, Salsa.Core, Salsa.Resolver,
+    Salsa.TypePrelude, Salsa.Driver
+  Extra-Libraries: oleaut32  
+
