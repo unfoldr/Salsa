@@ -9,6 +9,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
+[assembly: AssemblyTitle("Salsa")]
+[assembly: AssemblyDescription(".NET Bridge for Haskell")]
+[assembly: AssemblyProduct("Salsa")]
+[assembly: AssemblyCopyright("Copyright © 2007 Andrew Appleyard")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
+
 // TODO: Consider caching the results of the Get*Stub(string, ...) methods
 //       (although it's not really necessary, Haskell will cache the results).
 
