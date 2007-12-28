@@ -22,8 +22,8 @@ namespace Salsa
 
         static Driver()
         {
-            Console.WriteLine("Using Salsa.dll (built {0})",
-                File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location).ToString());
+            //Console.WriteLine("Using Salsa.dll (version {0})",
+            //    Assembly.GetExecutingAssembly().GetName().Version);
 
             Trace.Listeners.Add(new ConsoleTraceListener());
             System.Windows.Forms.Application.EnableVisualStyles();
@@ -37,6 +37,14 @@ namespace Salsa
             _inTable.Add(_nextId++, false); // ObjectId 2
         }
 
+        public static IntPtr Boot()
+        {
+            // TODO: Accept an option from Salsa for the threading model to use
+            // Thread.CurrentThread.SetApartmentState(ApartmentState.STA);
+
+            return GetPointerToMethod("GetPointerToMethod");
+        }
+
         /// <summary>
         /// Returns a native function pointer (as an int) to a stub wrapping the given method.
         /// </summary>
@@ -44,12 +52,9 @@ namespace Salsa
         /// This is the first .NET function called by Haskell, and is called by using the 
         /// ICLRRuntimeHost.ExecuteInDefaultAppDomain method.
         /// </remarks>
-        public static int GetPointerToMethod(string methodName)
+        public static IntPtr GetPointerToMethod(string methodName)
         {
-            // TODO: Accept an option from Salsa for the threading model to use
-            Thread.CurrentThread.SetApartmentState(ApartmentState.STA);
-
-            Trace.WriteLine("GetPointerToMethod(" + methodName + ")");
+            //Trace.WriteLine("GetPointerToMethod(" + methodName + ")");
             //Console.WriteLine("Called on thread: " + System.Threading.Thread.CurrentThread.ManagedThreadId);
 
             MethodInfo meth = typeof(Driver).GetMethod(methodName);
@@ -58,7 +63,7 @@ namespace Salsa
 
             // Return a delegate pointing to the indicated method (cast to an int 
             // so we can call this method using ExecuteInDefaultAppDomain)
-            return (int)GenerateMethodStub(meth);
+            return GenerateMethodStub(meth);
         }
 
         #region Entry points
