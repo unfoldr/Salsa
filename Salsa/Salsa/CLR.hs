@@ -25,7 +25,6 @@ module Salsa.CLR (
 import Data.Int
 import Foreign hiding (new, newForeignPtr)
 import Foreign.C.String
-import Unsafe.Coerce (unsafeCoerce)
 
 import Salsa.CLRHost
 
@@ -44,30 +43,40 @@ withCLR action = do
 
 startCLR :: IO ()
 startCLR = do
-    start_ICLRRuntimeHost clrHost
+    start_ICorRuntimeHost clrHost
     setFreeHaskellFunPtr 
 
 stopCLR :: IO ()
 stopCLR = do
     --saveDynamicAssembly -- (for debugging)
-    stop_ICLRRuntimeHost clrHost
+    stop_ICorRuntimeHost clrHost
     return ()
 
 -- | 'clrHost' stores a reference to the ICLRRuntimeHost for the .NET execution
 --   engine that is hosted in the process.
 {-# NOINLINE clrHost #-}
-clrHost :: ICLRRuntimeHost
+clrHost :: ICorRuntimeHost
 clrHost = unsafePerformIO $ corBindToRuntimeEx
 
+
 -- | @'unsafeGetPointerToMethod' m@ returns a function pointer to the method @m@ 
---  as implemented in the .NET bridge code (stored in Salsa.dll).  It is safe only
+--  as implemented in the Salsa .NET driver assembly (Salsa.dll).  It is safe only
 --  if the type of the resulting function pointer matches that of the method given.
 unsafeGetPointerToMethod :: String -> IO (FunPtr a)
 unsafeGetPointerToMethod methodName = do
-    result <- executeInDefaultAppDomain_ICLRRuntimeHost clrHost "Salsa.dll" "Salsa.Driver" "GetPointerToMethod" methodName
-    case result of
-        0 -> error $ "Unable to execute Salsa.dll method '" ++ methodName ++ "'."
-        otherwise -> return $ unsafeCoerce result -- Coerce the DWORD into a FunPtr of the appropriate type
+    -- result <- executeInDefaultAppDomain_ICLRRuntimeHost clrHost "Salsa.dll" "Salsa.Driver" "GetPointerToMethod" methodName
+    result <- withCWString methodName $ \methodName' -> getPointerToMethodRaw methodName'
+    if result == nullFunPtr
+        then error $ "Unable to execute Salsa.dll method '" ++ methodName ++ "'."
+        else return result
+
+{-# NOINLINE getPointerToMethodRaw #-}
+getPointerToMethodRaw :: GetPointerToMethodDelegate a
+getPointerToMethodRaw = makeGetPointerToMethodDelegate $ unsafePerformIO $ loadDriverAndBoot clrHost
+
+type GetPointerToMethodDelegate a = CWString -> IO (FunPtr a)
+foreign import stdcall "dynamic" makeGetPointerToMethodDelegate :: FunPtr (GetPointerToMethodDelegate a) ->
+    GetPointerToMethodDelegate a
 
 
 -- | Releases the .NET object indicated by the given object id.
@@ -85,7 +94,6 @@ setFreeHaskellFunPtr :: IO ()
 setFreeHaskellFunPtr = do
     funPtr <- wrapFreeHaskellFunPtr freeHaskellFunPtr
     setFreeHaskellFunPtrRaw funPtr
-
     -- Note: since the function passed into .NET may be used by .NET at any
     --       point until the engine is shutdown, and the engine is only loaded
     --       once per process, we don't need to free it.
