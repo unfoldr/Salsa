@@ -317,7 +317,7 @@ namespace Generator
                             if (mi.IsVirtual && (mi.Attributes & MethodAttributes.NewSlot) == 0) continue;
 
                             // Ignore methods containing parameters of unsupported types, or an 
-                            // unsupported result tpye
+                            // unsupported result type
                             if (IsUnsupportedType(mi.ReturnType) ||
                                 Sequence.Any(mi.GetParameters(),
                                     delegate(ParameterInfo pi) { return IsUnsupportedType(pi.ParameterType); }))
