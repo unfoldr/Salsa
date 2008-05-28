@@ -983,7 +983,9 @@ namespace Generator
                 t.IsPointer ||
                 // Salsa doesn't support generic types yet, but there's a special case for Nullable<bool>
                 (t.IsGenericType && t != typeof(Nullable<bool>)) ||
-                t.IsArray;          // FIXME: Implement
+                t.IsGenericParameter ||
+                // Salsa only supports arrays of non-generic types at present
+                (t.IsArray && IsUnsupportedType(t.GetElementType()));
         }
 
         /// <summary>
@@ -1136,6 +1138,10 @@ namespace Generator
             else if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 return string.Format("(Maybe {0})", TypeToLabel(t.GetGenericArguments()[0]));
+            }
+            else if (t.IsArray)
+            {
+                return string.Format("(Arr {0})", TypeToLabel(t.GetElementType()));
             }
             else
                 return ToLabel(t.Name);

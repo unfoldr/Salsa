@@ -13,7 +13,8 @@ module Salsa.Common (
     Obj(..),
     Null,
     Object_(..),
-    Int32
+    Int32,
+    Arr(..)
     ) where
 
 import Foreign hiding (new, newForeignPtr)
@@ -31,5 +32,8 @@ instance Show (Obj a) where
     show (Obj id _) = "Object(" ++ show id ++ ")"
 
 data Object_ = Object_
+
+-- | Represents .NET array types of element type @t@.
+data Arr t = Arr t
 
 -- vim:set sw=4 ts=4 expandtab:

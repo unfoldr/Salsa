@@ -13,6 +13,7 @@ module Salsa (
     new, invoke, set, get, delegate,
     AttrOp(..),
     withCLR, startCLR, stopCLR,
+    Arr(..),
     Int32,
     cast, Coercible
     ) where
