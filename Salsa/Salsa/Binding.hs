@@ -1,4 +1,4 @@
-{-# LANGUAGE ForeignFunctionInterface #-}
+{-# LANGUAGE ForeignFunctionInterface, TypeSynonymInstances #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      : Salsa.Binding
@@ -27,6 +27,9 @@ import Salsa.Resolver
 import Foreign hiding (new)
 import Foreign.C.String
 
+-- TODO: Perhaps move some/all of this into the generator, so that it can be
+--       CLR-version neutral.
+
 --
 -- Import the System.Type.GetType(String) method so it can be used in the
 -- implementations of 'typeOf' as produced by the generator.
@@ -40,5 +43,17 @@ type_GetType_stub :: Type_GetType_stub
 type_GetType_stub = make_Type_GetType_stub $ unsafePerformIO $ getMethodStub
     "System.Type, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" "GetType"
     "System.String"
+
+-- 
+-- Typeable instances for primitive types
+--
+
+instance Typeable Int32  where typeOf _ = typeOfString "System.Int32"
+instance Typeable String where typeOf _ = typeOfString "System.String"
+instance Typeable Bool   where typeOf _ = typeOfString "System.Boolean"
+instance Typeable Double where typeOf _ = typeOfString "System.Double"
+
+typeOfString :: String -> Obj Type_
+typeOfString = unsafePerformIO . marshalMethod1s type_GetType_stub undefined undefined
 
 -- vim:set sw=4 ts=4 expandtab:
