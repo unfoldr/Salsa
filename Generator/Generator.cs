@@ -293,6 +293,19 @@ namespace Generator
             w.WriteLine("--");
             w.WriteLine();
 
+
+            //
+            // Write a Salsa.Typeable instance for this class
+            //
+            // Note: Type.GetType always returns the same instance for a given type, so it is 
+            //       safe to use 'unsafePerformIO' below.
+            //
+            w.WriteLine("instance Typeable {0} where", classLabel);
+            w.WriteLine("  typeOf _ = unsafePerformIO $ marshalMethod1s type_GetType_stub undefined undefined \"{0}\"", targetType.AssemblyQualifiedName);
+            w.WriteLine();
+
+            // TODO: Cache result of 'typeOf' in an IORef?
+
             {
                 //
                 // Instance and static methods
@@ -1152,7 +1165,7 @@ namespace Generator
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentException("Expected non-empty string.");
             s = char.ToUpper(s[0]) + s.Substring(1);
-            if (!_labels.Contains(s) && s != "Object") // 'Object' is defined in the library
+            if (!_labels.Contains(s) && s != "Object" && s != "Type") // 'Object' and 'Type' are defined in the Salsa library
                 _labels.Add(s);
             return s + "_";
         }

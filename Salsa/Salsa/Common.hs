@@ -13,6 +13,7 @@ module Salsa.Common (
     Obj(..),
     Null,
     Object_(..),
+    Type_(..),
     Int32,
     Arr(..)
     ) where
@@ -32,6 +33,8 @@ instance Show (Obj a) where
     show (Obj id _) = "Object(" ++ show id ++ ")"
 
 data Object_ = Object_
+
+data Type_ = Type_ -- Label for System.Type
 
 -- | Represents .NET array types of element type @t@.
 data Arr t = Arr t
