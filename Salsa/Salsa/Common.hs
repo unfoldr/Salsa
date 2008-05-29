@@ -32,9 +32,8 @@ data Null
 instance Show (Obj a) where
     show (Obj id _) = "Object(" ++ show id ++ ")"
 
-data Object_ = Object_
-
-data Type_ = Type_ -- Label for System.Type
+data Object_ = Object_ -- Label for System.Object
+data Type_ = Type_     -- Label for System.Type
 
 -- | Represents .NET array types of element type @t@.
 data Arr t = Arr t
