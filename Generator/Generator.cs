@@ -814,7 +814,7 @@ namespace Generator
             bool isStatic = IsMemberStatic(firstAccessor.Accessor);
 
             string target = isStatic ? TypeToLabel(forType) : ToHaskellType(forType);
-            string label = ToLabel(firstAccessor.Owner.Name);
+            string label = ToLabelType(firstAccessor.Owner.Name);
 
             w.WriteLine("instance Prop {0} {1} where", target, label);
 
@@ -863,7 +863,7 @@ namespace Generator
             bool isStatic = IsMemberStatic(firstAccessor.Accessor);
 
             string target = isStatic ? TypeToLabel(forType) : ToHaskellType(forType);
-            string label = ToLabel(firstAccessor.Owner.Name);
+            string label = ToLabelType(firstAccessor.Owner.Name);
 
             w.WriteLine("instance Event {0} {1} where", target, label);
             w.WriteLine("    type EventT {0} {1} = {2}", target, label,
@@ -899,7 +899,7 @@ namespace Generator
             //       the metadata should be included in the generated code.
 
             string target = isStatic ? TypeToLabel(forType) : ToHaskellType(forType);
-            string label = ToLabel(field.Name);
+            string label = ToLabelType(field.Name);
 
             w.WriteLine("instance Prop {0} {1} where", target, label);
 
@@ -1135,18 +1135,18 @@ namespace Generator
         private string MethodToLabel(MethodInfo mi)
         {
             ToInvoker(mi.Name);
-            return ToLabel(mi.Name);
+            return ToLabelType(mi.Name);
         }
 
         private string TypeToLabel(Type t)
         {
-            if (IsUnsupportedType(t)) return ToLabel("NotSupported"); 
+            if (IsUnsupportedType(t)) return ToLabelType("NotSupported"); 
 
             if (t.IsNested && t.DeclaringType != null)
             {
                 // FIXME: This only handles one level of nested classes 
                 //        (and it doesn't handle nested generic types)
-                return ToLabel(t.DeclaringType.Name + "_" + t.Name);
+                return ToLabelType(t.DeclaringType.Name + "_" + t.Name);
             }
             else if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
@@ -1157,43 +1157,56 @@ namespace Generator
                 return string.Format("(Arr {0})", TypeToLabel(t.GetElementType()));
             }
             else
-                return ToLabel(t.Name);
+                return ToLabelType(t.Name);
         }
 
-        private string ToLabel(string s)
+        private string ToLabelHelper(string s)
         {
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentException("Expected non-empty string.");
             s = char.ToUpper(s[0]) + s.Substring(1);
             if (!_labels.Contains(s) && s != "Object" && s != "Type") // 'Object' and 'Type' are defined in the Salsa library
                 _labels.Add(s);
-            return s + "_";
+            return s;
+        }
+
+        private string ToLabelValue(string s)
+        {
+            return "_" + ToLabelHelper(s);
+        }
+
+        private string ToLabelType(string s)
+        {
+            return ToLabelHelper(s) + "_";
         }
 
         private void WriteLabels()
         {
             w.WriteLine("-- Labels for .NET types, methods, properties, fields and events");
             foreach (string label in _labels)
-                w.WriteLine("data {0,-25} = {0,-25}", ToLabel(label));
+                w.WriteLine("data {0,-25}", ToLabelType(label));
+            w.WriteLine();
+            foreach (string label in _labels)
+                w.WriteLine("{0,-30} = undefined :: {1}", ToLabelValue(label), ToLabelType(label));
             w.WriteLine();
         }
 
         private string ToInvoker(string s)
         {
+            s = Util.ToLowerFirst(s);
             if (!_invokers.Contains(s))
                 _invokers.Add(s);
             return "_" + s;
         }
 
         private void WriteInvokers()
-
         {
             w.WriteLine("-- Functions for invoking methods with '#'");
             foreach (string invoker in _invokers)
             {
                 // Output an invoker (and a unit invoker, for convenience and consistency)
-                w.WriteLine("{0} args target = invoke target {1} args", ToInvoker(invoker), ToLabel(invoker));
-                w.WriteLine("{0}_ target = invoke target {1} ()", ToInvoker(invoker), ToLabel(invoker));
+                w.WriteLine("{0} args target = invoke target {1} args", ToInvoker(invoker), ToLabelValue(invoker));
+                w.WriteLine("{0}_ target = invoke target {1} ()", ToInvoker(invoker), ToLabelValue(invoker));
             }
             w.WriteLine();
         }
@@ -1223,6 +1236,18 @@ namespace Generator
             }
             sb.Append(end);
             return sb.ToString();
+        }
+
+        public static string ToLowerFirst(string s)
+        {
+            if (s == "") return "";
+            return s.Substring(0, 1).ToLower() + s.Substring(1);
+        }
+
+        public static string ToUpperFirst(string s)
+        {
+            if (s == "") return "";
+            return s.Substring(0, 1).ToUpper() + s.Substring(1);
         }
     }
 
