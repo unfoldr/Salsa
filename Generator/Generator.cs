@@ -169,7 +169,7 @@ namespace Generator
                     {
                         if (sides.Length != 2)
                             throw new Exception("Must specify assembly name after 'reference'");
-                        references.Add(Assembly.LoadFile(sides[1]));
+                        references.Add(Assembly.LoadFile(Path.GetFullPath(sides[1])));
                     }
                     else
                     {
