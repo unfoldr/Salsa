@@ -14,7 +14,7 @@ module Salsa.Binding (
     module Salsa.CLR,
     module Salsa.TypePrelude,
     module Salsa.Resolver,
-    withCWString, CWString, FunPtr, unsafePerformIO,
+    withCWString, CWString, FunPtr, unsafePerformIO, liftM,
     type_GetType_stub
     ) where
 
@@ -26,6 +26,8 @@ import Salsa.Resolver
 
 import Foreign hiding (new)
 import Foreign.C.String
+
+import Control.Monad (liftM)
 
 -- TODO: Perhaps move some/all of this into the generator, so that it can be
 --       CLR-version neutral.

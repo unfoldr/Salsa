@@ -34,7 +34,7 @@ type instance  IsRef t = TNot (IsPrim t)
 -- Operations on the encoded (Gödel) representations of .NET types:
 --
 
--- | 'Code' maps labels representing .NET types to a type-level list of boolean
+-- | 'TyCode' maps labels representing .NET types to a type-level list of hexadecimal
 --   values (similar to Gödel numbering) which can (then) be compared for equality.
 --   This avoids having to define a large type function for comparing every pair
 --   of labels used to represent .NET types.
