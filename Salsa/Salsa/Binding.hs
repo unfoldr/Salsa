@@ -1,4 +1,4 @@
-{-# LANGUAGE ForeignFunctionInterface, TypeSynonymInstances #-}
+{-# LANGUAGE ForeignFunctionInterface, TypeSynonymInstances, ScopedTypeVariables #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      : Salsa.Binding
@@ -33,8 +33,9 @@ import Control.Monad (liftM)
 --       CLR-version neutral.
 
 --
--- Import the System.Type.GetType(String) method so it can be used in the
--- implementations of 'typeOf' as produced by the generator.
+-- Import the System.Type.GetType(String) and System.Type.MakeArrayType(Int32)
+-- methods so they can be used in the implementations of 'typeOf' as produced by
+-- the generator.
 --
 
 type Type_GetType_stub = CWString -> IO ObjectId
@@ -45,6 +46,16 @@ type_GetType_stub :: Type_GetType_stub
 type_GetType_stub = make_Type_GetType_stub $ unsafePerformIO $ getMethodStub
     "System.Type, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" "GetType"
     "System.String"
+
+
+type Type_MakeArrayType_stub = ObjectId -> Int32 -> IO ObjectId
+foreign import stdcall "dynamic" make_Type_MakeArrayType_stub :: FunPtr Type_MakeArrayType_stub -> Type_MakeArrayType_stub
+
+{-# NOINLINE type_MakeArrayType_stub #-}
+type_MakeArrayType_stub :: Type_MakeArrayType_stub
+type_MakeArrayType_stub = make_Type_MakeArrayType_stub $ unsafePerformIO $ getMethodStub
+    "System.Type, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" "MakeArrayType"
+    "System.Int32"
 
 -- 
 -- Typeable instances for primitive types
@@ -57,5 +68,13 @@ instance Typeable Double where typeOf _ = typeOfString "System.Double"
 
 typeOfString :: String -> Obj Type_
 typeOfString = unsafePerformIO . marshalMethod1s type_GetType_stub undefined undefined
+
+-- Define the typeOf function for arrays by first calling typeOf on the element type,
+-- and then using the Type.MakeArrayType method to return the associated one-dimensional
+-- array type:
+instance Typeable t => Typeable (Arr t) where
+  typeOf _ = unsafePerformIO $
+    marshalMethod1i type_MakeArrayType_stub (typeOf (undefined :: t)) undefined (1 :: Int32)
+    -- Note: this function requires ScopedTypeVariables
 
 -- vim:set sw=4 ts=4 expandtab:
