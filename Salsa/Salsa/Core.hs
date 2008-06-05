@@ -217,6 +217,10 @@ instance Coercible String  (Obj t) where
     coerce s = unsafePerformIO (boxString s >>= unmarshal) -- boxing conversion
     -- TODO: Ensure that this is sufficiently referentially transparent.
 
+instance Coercible Int32  (Obj t) where
+    coerce i = unsafePerformIO (boxInt32 i >>= unmarshal) -- boxing conversion
+    -- TODO: Ensure that this is sufficiently referentially transparent.
+
 -- Coercible tuples:
 instance Coercible ()      ()      where coerce = id
 instance (Coercible f0 t0, Coercible f1 t1) =>

@@ -19,7 +19,7 @@ module Salsa.CLR (
     getFieldGetStub,
     getFieldSetStub,
     getDelegateConstructorStub,
-    boxString, boxBoolean 
+    boxString, boxInt32, boxBoolean 
     ) where
 
 import Data.Int
@@ -234,6 +234,17 @@ foreign import stdcall "dynamic" makeBoxStringStub :: FunPtr BoxStringStub -> Bo
 {-# NOINLINE boxStringStub #-}
 boxStringStub :: BoxStringStub
 boxStringStub = makeBoxStringStub $ unsafePerformIO $ getBoxStub "System.String"
+
+
+boxInt32 :: Int32 -> IO ObjectId
+boxInt32 = boxInt32Stub
+
+type BoxInt32Stub = Int32 -> IO ObjectId
+foreign import stdcall "dynamic" makeBoxInt32Stub :: FunPtr BoxInt32Stub -> BoxInt32Stub
+
+{-# NOINLINE boxInt32Stub #-}
+boxInt32Stub :: BoxInt32Stub
+boxInt32Stub = makeBoxInt32Stub $ unsafePerformIO $ getBoxStub "System.Int32"
 
 
 boxBoolean :: Bool -> ObjectId
