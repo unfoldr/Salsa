@@ -237,6 +237,13 @@ instance (Coercible f t) => Coercible f (IO t)  where
 
 cast v = coerce v
 
+-- Checked implicit conversion:
+convert :: (Coercible from to, ConvertsTo from to ~ TTrue) => from -> to
+convert v = coerce v
+
+-- TODO: Fix up the whole: coerce vs. cast vs. convert thing.
+--       Work out what's required (i.e. implicit/explicit conversions,
+--       checked or unchecked, etc.)
 
 --
 -- Marshaling support

@@ -8,18 +8,19 @@
 --
 -----------------------------------------------------------------------------
 module Salsa (
-    Obj, null_,
+    Obj, _Obj,
+    null_, isNull,
     ( # ), (>>=#),
     new, invoke, set, get, delegate,
     AttrOp(..),
     withCLR, startCLR, stopCLR,
-    Arr(..),
+    Arr,         _Arr,
     Int32,
     cast, Coercible,
     Object_(..), _Object,
     Type_(..),   _Type,
     Int32_,      _Int32,
-    String_,     _String,
+    String_,     _String
     ) where
 
 import Salsa.Core

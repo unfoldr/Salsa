@@ -29,6 +29,8 @@ type instance  IsPrim (Obj t)    = TFalse
 
 type family    IsRef t
 type instance  IsRef t = TNot (IsPrim t)
+-- FIXME: This definition of IsRef is incorrect.  String is a reference
+--        type (in .NET) but it is also a primitive bridge type.
 
 --
 -- Operations on the encoded (Gödel) representations of .NET types:
@@ -46,6 +48,15 @@ type instance TyCode Bool               = D2 ::: TNil
 type instance TyCode Double             = D3 ::: TNil
 type instance TyCode (Obj Null)         = D4 ::: TNil
 type instance TyCode (Maybe Bool)       = D5 ::: TNil -- Temporary HACK
+
+
+type family FromTyCode t
+type instance FromTyCode (D0 ::: TNil) = Int32
+type instance FromTyCode (D1 ::: TNil) = String
+type instance FromTyCode (D2 ::: TNil) = Bool
+type instance FromTyCode (D3 ::: TNil) = Double
+type instance FromTyCode (D4 ::: TNil) = Obj Null
+type instance FromTyCode (D5 ::: TNil) = Maybe Bool
 
 
 -- | 'TyEq t1 t2' is true iff the types @t1@ and @t2@ are the same .NET type
@@ -176,6 +187,17 @@ type instance  IsBetterConv t t1 t2 =
     TOr  (TAnd (TyEq t t1) (TNot (TyEq t t2)))
          (TAnd (ConvertsTo t1 t2) (TNot (ConvertsTo t2 t1)))
 
+--
+-- Original:
+--
+-- type instance  ConvertsTo t1 t2 =
+--     (TOr  (TyEq t1 t2)
+--     (TOr  (TAnd (IsPrim t1)           (TyEq t2 (Obj Object_)))
+--     (TOr  (TAnd (TyEq t1 Int32)       (TyEq t2 Double))
+--     (TOr  (TAnd (TyEq t1 (Obj Null))  (IsRef t2))
+--           (TAnd (TAnd (IsRef t1) (IsRef t2))
+--                 (IsSubtypeOf t1 t2))))))
+--
 
 -- | @'ConvertsTo' s t@ returns true iff there is an implicit conversion from @s@
 --   to @t@ (ref 6.1).
@@ -185,8 +207,11 @@ type instance  ConvertsTo t1 t2 =
     (TOr  (TAnd (IsPrim t1)           (TyEq t2 (Obj Object_)))
     (TOr  (TAnd (TyEq t1 Int32)       (TyEq t2 Double))
     (TOr  (TAnd (TyEq t1 (Obj Null))  (IsRef t2))
+    (TOr  (TAnd (TAnd (IsArr t1) (IsArr t2))
+                (IsSubtypeOf' (ArrElemTy t1) (ArrElemTy t2)))
           (TAnd (TAnd (IsRef t1) (IsRef t2))
-                (IsSubtypeOf t1 t2))))))
+                (IsSubtypeOf t1 t2)))))))
+
 
 --    (TOr5 (TyEq t1 t2)
 --          (TAnd (IsPrim t1)           (TyEq t2 (Obj Object_)))
@@ -200,6 +225,29 @@ type family    IsSubtypeOf t1 t2
 type instance  IsSubtypeOf t1 t2  = 
     TOr (TyEq t1 t2)
         (TyElem t2 (SupertypesOf t1))
+
+type family    IsArr t
+type instance  IsArr t = TAnd (TNot (TyEq t (Obj Array_)))
+                              (IsSubtypeOf t (Obj Array_))
+
+type family   ArrElemTy t
+type instance ArrElemTy t =
+    ArrElemTy' (TyCode t)
+
+type family   ArrElemTy' tc
+type instance ArrElemTy' (D0 ::: DF ::: tc) = tc
+type family    IsSubtypeOf' t1 t2
+type instance  IsSubtypeOf' t1 TNil = TFalse -- we need this so that we can short-circuit evaluation
+type instance  IsSubtypeOf' t1 (t2 ::: t2s) = 
+    TOr (TyEq' t1 (t2 ::: t2s))
+        (TyElem' (t2 ::: t2s) (SupertypesOf (FromTyCode t1)))
+
+type family   TyEq' t1 t2
+type instance TyEq' t1 t2 = DigitsEq t1 t2
+
+type family    TyElem' t1 ts
+type instance  TyElem' t1 TNil        = TFalse
+type instance  TyElem' t1 (t ::: ts)  = TOr (TyEq' t1 (TyCode t)) (TyElem' t1 ts) -- UGLY!
 
 -- | @'SupertypesOf' t@ is the list of supertypes of @t@.
 type family SupertypesOf t

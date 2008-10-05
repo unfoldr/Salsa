@@ -15,7 +15,7 @@ module Salsa.Binding (
     module Salsa.TypePrelude,
     module Salsa.Resolver,
     withCWString, CWString, FunPtr, unsafePerformIO, liftM,
-    type_GetType_stub
+    type_GetType
     ) where
 
 import Salsa.Common
@@ -38,14 +38,16 @@ import Control.Monad (liftM)
 -- the generator.
 --
 
-type Type_GetType_stub = CWString -> IO ObjectId
+type Type_GetType_stub = CWString -> Bool -> IO ObjectId
 foreign import stdcall "dynamic" make_Type_GetType_stub :: FunPtr Type_GetType_stub -> Type_GetType_stub
 
 {-# NOINLINE type_GetType_stub #-}
 type_GetType_stub :: Type_GetType_stub
 type_GetType_stub = make_Type_GetType_stub $ unsafePerformIO $ getMethodStub
     "System.Type, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" "GetType"
-    "System.String"
+    "System.String;System.Boolean"
+
+type_GetType typeName = marshalMethod2s type_GetType_stub undefined undefined (typeName, True)
 
 
 type Type_MakeArrayType_stub = ObjectId -> Int32 -> IO ObjectId
@@ -67,7 +69,10 @@ instance Typeable Bool   where typeOf _ = typeOfString "System.Boolean"
 instance Typeable Double where typeOf _ = typeOfString "System.Double"
 
 typeOfString :: String -> Obj Type_
-typeOfString = unsafePerformIO . marshalMethod1s type_GetType_stub undefined undefined
+typeOfString s = unsafePerformIO $ do
+--    putStrLn $ "typeOfString: " ++ s
+    type_GetType s
+--    marshalMethod1s type_GetType_stub undefined undefined s
 
 -- Define the typeOf function for arrays by first calling typeOf on the element type,
 -- and then using the Type.MakeArrayType method to return the associated one-dimensional
@@ -76,5 +81,9 @@ instance Typeable t => Typeable (Arr t) where
   typeOf _ = unsafePerformIO $
     marshalMethod1i type_MakeArrayType_stub (typeOf (undefined :: t)) undefined (1 :: Int32)
     -- Note: this function requires ScopedTypeVariables
+
+-- Define typeOf for reference types in terms of the associated static type.
+instance Typeable t => Typeable (Obj t) where
+  typeOf _ = typeOf (undefined :: t)
 
 -- vim:set sw=4 ts=4 expandtab:

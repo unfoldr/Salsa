@@ -38,7 +38,10 @@ type instance SupertypesOf (Obj (Arr t)) = (Obj Array_) ::: SupertypesOf (Obj Ar
 
 -- Define the type code of single-dimension arrays in terms of the underlying
 -- element type:
-type instance TyCode (Obj (Arr t)) = D0 ::: DF ::: TyCode t ::: TNil
+type instance TyCode (Obj (Arr t)) = D0 ::: DF ::: TyCode t
 -- (Note the use of 'DF' to separate the type code of the element from the type code 
 -- of arrays in general.)
+
+-- EXPERIMENTAL:
+type instance FromTyCode (D0 ::: DF ::: t) = Obj (Arr (FromTyCode t))
 

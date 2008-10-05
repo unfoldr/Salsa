@@ -31,7 +31,7 @@ namespace Generator
         /// </summary>
         private Dictionary<string, long> _uniqueIds = new Dictionary<string, long>();
 
-        private int _typeCodeMaxValue = 16;
+        private int _typeCodeMaxValue = 15;
         private int _typeCodeValue = 7; // Leave first 7 codes available for primitive types
 
         /// <summary>
@@ -313,7 +313,7 @@ namespace Generator
             //       safe to use 'unsafePerformIO' below.
             //
             w.WriteLine("instance Typeable {0} where", classLabel);
-            w.WriteLine("  typeOf _ = unsafePerformIO $ marshalMethod1s type_GetType_stub undefined undefined \"{0}\"", targetType.AssemblyQualifiedName);
+            w.WriteLine("  typeOf _ = unsafePerformIO $ type_GetType \"{0}\"", targetType.AssemblyQualifiedName);
             w.WriteLine();
 
             // TODO: Cache result of 'typeOf' in an IORef?
@@ -372,7 +372,6 @@ namespace Generator
                         w.WriteLine("-- " + mg.Key);
 
                         WriteMethodGroup(mg, targetType);
-                        // SHOULD BE: WriteMethodGroup(mg, targetType);
                     }
                 }
 
@@ -586,9 +585,9 @@ namespace Generator
             //
             // Type code
             //
-            w.WriteLine("type instance TyCode {0} = {1}",
-                ToHaskellType(targetType), GetNextTypeCode());
-
+            string typeCode = GetNextTypeCode();
+            w.WriteLine("type instance TyCode {0} = {1}", ToHaskellType(targetType), typeCode);
+            w.WriteLine("type instance FromTyCode ({1}) = {0}", ToHaskellType(targetType), typeCode); // EXPERIMENTAL
             w.WriteLine();
 
             if (targetType == typeof(System.Array))
@@ -678,6 +677,8 @@ namespace Generator
         private void WriteMethodGroup(IEnumerable<MemberInfo> members, Type forType)
         {
             MemberInfo firstMi = Sequence.First(members);
+
+            Console.WriteLine("  {0}", firstMi.Name);
 
             ParameterInfo[] parameters = GetParameters(firstMi);
             Type returnType = GetMemberReturnType(firstMi);
@@ -1195,7 +1196,8 @@ namespace Generator
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentException("Expected non-empty string.");
             s = char.ToUpper(s[0]) + s.Substring(1);
-            if (!_labels.Contains(s) && s != "Object" && s != "Type") // 'Object' and 'Type' are defined in the Salsa library
+            if (!_labels.Contains(s) && 
+                s != "Object" && s != "Type" && s != "Array") // These labels are defined in the Salsa library
                 _labels.Add(s);
             return s;
         }
