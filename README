@@ -23,11 +23,15 @@ Generator: the Salsa binding generator.
 
 Samples\
 
+  Some sample programs that use the Salsa library.  Just run 'msbuild' in
+  the sample's directory to build it.
+
   Hello      - Hello World sample (requires .NET 2.0 or later).
 
   Conway     - Simulator for Conway's Game of Life.  Uses the Windows
                Presentation Foundation library in .NET 3.0 for the GUI
                (requires .NET 3.0 or later).
+
 
 --
 Andrew Appleyard <andrew.appleyard@gmail.com>

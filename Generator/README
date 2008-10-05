@@ -28,5 +28,8 @@ where 'Project.imports' is a file that lists (on separate lines):
 Building:
   To build Generator.exe, just run 'msbuild' in the 'Generator' directory.
 
+  (MSBuild is part of the .NET Framework and can be found in:
+  '%WINDIR%\Microsoft.NET\Framework\v2.0.50272')
+
 --
 Andrew Appleyard <andrew.appleyard@gmail.com>
