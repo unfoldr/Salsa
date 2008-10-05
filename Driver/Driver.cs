@@ -1,3 +1,10 @@
+//
+// Salsa .NET Driver
+//
+// Copyright: (c) 2007-2008 Andrew Appleyard
+// Licence:   BSD3 (see LICENSE)
+//
+
 using System;
 using System.Collections.Generic;
 using System.Text;
