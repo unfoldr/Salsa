@@ -19,7 +19,7 @@ import Data.Time.LocalTime (getZonedTime)
 main :: IO ()
 main = do
     now <- getZonedTime
-    printf   "-- Generated at %s" now
+    putStrLn ("-- Generated " ++ show now)
     putStrLn "module Foreign.Salsa.Driver (driverData) where"
     putStrLn "import qualified Data.ByteString.Char8 as B"
     putStrLn "{-# NOINLINE driverData #-}"
