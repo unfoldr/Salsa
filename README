@@ -1,0 +1,33 @@
+Salsa: a .NET bridge for Haskell
+--------------------------------
+
+Foreign\Salsa: the Foreign.Salsa library.
+
+  Exposes the Haskell-side interface to Salsa, including: functions to load the
+  .NET runtime into the process, functions for interactive with .NET classes
+  and objects, and the required type-level machinery.
+
+Driver: the Salsa .NET driver assembly (Salsa.dll).
+
+  Contains the .NET code that is loaded by the Salsa library to call in and out
+  of the .NET runtime.  The assembly binary (Salsa.dll) is embedded in
+  Foreign\Salsa\Driver.hs with Embed.hs.
+
+Generator: the Salsa binding generator.
+
+  A C# program that generates Haskell files from .NET metadata to provide
+  type-safe access to the requested .NET classes and methods in .NET
+  assembilies.
+  
+  Note: this requires .NET 3.5 because it uses the System.Linq namespace.
+
+Samples\
+
+  Hello      - Hello World sample (requires .NET 2.0 or later).
+
+  Conway     - Simulator for Conway's Game of Life.  Uses the Windows
+               Presentation Foundation library in .NET 3.0 for the GUI
+               (requires .NET 3.0 or later).
+
+--
+Andrew Appleyard <andrew.appleyard@gmail.com>
