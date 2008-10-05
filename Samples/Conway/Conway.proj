@@ -1,0 +1,49 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Module>Conway</Module>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Generate Include="$(Module).imports" />
+  </ItemGroup>
+  <ItemGroup>
+    <BindingFiles Include="Bindings.hs;Labels.hs" />
+  </ItemGroup>
+  <ItemGroup>
+    <IntermediateFiles Include="*.hi;*.o" />
+  </ItemGroup>
+
+  <!-- Build the 'Generator' program if necessary -->
+  <Target Name="BuildGenerator">
+    <MSBuild Projects="..\..\Generator\Generator.csproj"
+             ContinueOnError="false"
+             Properties="Configuration=Release">
+      <Output TaskParameter="TargetOutputs" ItemName="Generator" />
+    </MSBuild>
+  </Target>
+
+  <!-- Call 'Generator' to create the binding files from the import files -->
+  <Target Name="GenerateBindings" 
+          Inputs="@(Generate);@(Generator)"
+          Outputs="@(BindingFiles)"
+          DependsOnTargets="BuildGenerator">
+    <Exec Command="@(Generator) @(Generate)" />
+  </Target>
+
+  <!-- Run GHC to build the main program -->
+  <Target Name="Build"
+          DependsOnTargets="GenerateBindings">
+    <Exec Command="ghc --make $(Module) -fglasgow-exts -threaded" />
+  </Target>
+
+  <Target Name="Clean" >
+    <Delete Files="$(Module).exe" />
+    <Delete Files="$(Module).exe.manifest" />
+    <Delete Files="@(BindingFiles)" />
+    <Delete Files="@(BindingFiles -> '%(Filename)_stub.c')" />
+    <Delete Files="@(BindingFiles -> '%(Filename)_stub.h')" />
+    <Delete Files="@(IntermediateFiles)" />
+  </Target>
+
+  <Target Name="Rebuild" DependsOnTargets="Clean;Build" />
+</Project>
