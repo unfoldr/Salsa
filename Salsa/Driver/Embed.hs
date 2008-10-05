@@ -14,15 +14,18 @@ module Main where
 import System.Environment
 import qualified Data.ByteString as S
 import Text.Printf
+import Data.Time.LocalTime (getZonedTime)
 
 main :: IO ()
 main = do
+    now <- getZonedTime
+    printf   "-- Generated at %s" now
     putStrLn "module Salsa.Driver (driverData) where"
     putStrLn "import qualified Data.ByteString.Char8 as B"
     putStrLn "{-# NOINLINE driverData #-}"
     putStr "driverData = B.pack \""
     [inputFile] <- getArgs
-    s <- S.readFile inputFile --"Salsa.dll"
+    s <- S.readFile inputFile
     mapM_ (\x -> printf "\\x%02x" x) (S.unpack s)
     putStrLn "\""
 
