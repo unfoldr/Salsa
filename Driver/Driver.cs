@@ -19,7 +19,7 @@ using System.Threading;
 [assembly: AssemblyTitle("Salsa")]
 [assembly: AssemblyDescription(".NET Bridge for Haskell")]
 [assembly: AssemblyProduct("Salsa")]
-[assembly: AssemblyCopyright("Copyright © 2007 Andrew Appleyard")]
+[assembly: AssemblyCopyright("Copyright © 2007-2008 Andrew Appleyard")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
@@ -88,10 +88,19 @@ namespace Salsa
         /// </summary>
         public static void SetFreeHaskellFunPtr(IntPtr freeHaskellFunPtr)
         {
-            // Store the delegate wrapping the 'freeHaskellFunPtr' function passed in
-            FreeHaskellFunPtr =
-                (FreeHaskellFunPtrDelegate)Marshal.GetDelegateForFunctionPointer(
-                    freeHaskellFunPtr, typeof(FreeHaskellFunPtrDelegate));
+            if (freeHaskellFunPtr == IntPtr.Zero)
+            {
+                // Clear any previously stored delegate wrapping 'freeHaskellFunPtr'
+                // (this will prevent calls into Haskell from .NET finalizers)
+                FreeHaskellFunPtr = null;
+            }
+            else
+            {
+                // Store the delegate wrapping the 'freeHaskellFunPtr' function passed in
+                FreeHaskellFunPtr =
+                    (FreeHaskellFunPtrDelegate)Marshal.GetDelegateForFunctionPointer(
+                        freeHaskellFunPtr, typeof(FreeHaskellFunPtrDelegate));
+            }
             Trace.WriteLine(string.Format("SetFreeHaskellFunPtr(0x{0:x})", freeHaskellFunPtr));
         }
 
@@ -833,16 +842,25 @@ namespace Salsa
                 //
                 //     ~Delegate()
                 //     {
-                //         Driver.FreeHaskellFunPtr(Marshal.GetFunctionPointerForDelegate(
-                //             _thunkDelegate));
+                //         if (Driver.FreeHaskellFunPtr != null)
+                //             Driver.FreeHaskellFunPtr(Marshal.GetFunctionPointerForDelegate(
+                //                 _thunkDelegate));
                 //     }
 
                 MethodBuilder finalizeMethod = typeBuilder.DefineMethod("Finalize",
                     MethodAttributes.Family | MethodAttributes.HideBySig | MethodAttributes.Virtual);
                 finalizeMethod.SetImplementationFlags(MethodImplAttributes.IL | MethodImplAttributes.Managed);
                 ILGenerator ilg = finalizeMethod.GetILGenerator();
+                Label endLabel = ilg.DefineLabel();
 
                 // Obtain the freeHaskellFunPtr delegate
+                ilg.Emit(OpCodes.Ldsfld, MemberInfos.Driver_FreeHaskellFunPtr);
+
+                // Return immediately if the delegate is null
+                ilg.Emit(OpCodes.Ldc_I4_0);
+                ilg.Emit(OpCodes.Beq, endLabel);
+
+                // Obtain the freeHaskellFunPtr delegate (again)
                 ilg.Emit(OpCodes.Ldsfld, MemberInfos.Driver_FreeHaskellFunPtr);
 
                 // Load _thunkDelegate
@@ -855,6 +873,7 @@ namespace Salsa
                 // Invoke freeHaskellFunPtr on this function pointer
                 ilg.Emit(OpCodes.Call, MemberInfos.FreeHaskellFunPtrDelegate_Invoke);
 
+                ilg.MarkLabel(endLabel);
                 ilg.Emit(OpCodes.Ret);
             }
 

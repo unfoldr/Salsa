@@ -44,11 +44,17 @@ withCLR action = do
 startCLR :: IO ()
 startCLR = do
     start_ICorRuntimeHost clrHost
+
+    -- Allow .NET to call into Haskell and free unused function pointer wrappers
     setFreeHaskellFunPtr 
 
 stopCLR :: IO ()
 stopCLR = do
-    --saveDynamicAssembly -- (for debugging)
+    -- saveDynamicAssembly -- (for debugging)
+
+    -- Prevent .NET finalizers from calling into Haskell (and causing access violations)
+    clearFreeHaskellFunPtr
+
     stop_ICorRuntimeHost clrHost
     return ()
 
@@ -96,6 +102,12 @@ setFreeHaskellFunPtr = do
     -- Note: since the function passed into .NET may be used by .NET at any
     --       point until the engine is shutdown, and the engine is only loaded
     --       once per process, we don't need to free it.
+
+
+-- | Clears the 'freeHaskellFunPtr' pointer on the .NET side to prevent finalizers from
+--   calling into Haskell (and causing access violations).
+clearFreeHaskellFunPtr :: IO ()
+clearFreeHaskellFunPtr = setFreeHaskellFunPtrRaw nullFunPtr
 
 
 {-# NOINLINE setFreeHaskellFunPtrRaw #-}
