@@ -1,19 +1,66 @@
-Name:           Salsa
-Version:        1.0.0
 Cabal-Version:  >= 1.2
-License:        BSD3
-License-File:   LICENSE.txt
-Author:         Andrew Appleyard
+
+Name:           Salsa
+Version:        0.1.0.0
+Build-Type:     Simple
+
 Category:       Foreign
 Synopsis:       A .NET Bridge for Haskell
-Build-Type:     Simple
+Description:
+  Salsa is an experimental Haskell library and code generator that allows
+  Haskell programs to host the .NET runtime and interact with .NET libraries.
+  It uses type families extensively to provide a type-safe mapping of the .NET
+  object model in the Haskell type system.
+
+License:        BSD3
+License-File:   LICENSE
+Author:         Andrew Appleyard
+Maintainer:     Andrew Appleyard <andrew.appleyard@gmail.com>
+Homepage:       http://haskell.org/haskellwiki/Salsa
+
+Copyright:      (c) 2007-2008 Andrew Appleyard
+Stability:      Experimental
+
+Tested-With:    GHC==6.8.3
+
+Extra-Source-Files:
+  README
+
+  Driver/README
+  Driver/Driver.proj
+  Driver/Driver.cs
+  Driver/Embed.hs
+
+  Generator/README
+  Generator/Generator.csproj
+  Generator/Generator.cs
+  Generator/Set.cs
+  Generator/Array.hs
+
+  Samples/Hello/Hello.proj
+  Samples/Hello/Hello.hs
+  Samples/Hello/Hello.imports
+
+  Samples/Conway/Conway.proj
+  Samples/Conway/Conway.hs
+  Samples/Conway/Conway.imports
+  Samples/Conway/Conway.xaml
+
+  Docs/Thesis.pdf
 
 Library
   Build-Depends: base, Win32, bytestring
+
   Exposed-modules:
-    Salsa, Salsa.Binding
+    Foreign.Salsa
+    Foreign.Salsa.Binding
+
   Other-Modules:
-    Salsa.CLR, Salsa.CLRHost, Salsa.Common, Salsa.Core, Salsa.Resolver,
-    Salsa.TypePrelude, Salsa.Driver
-  Extra-Libraries: oleaut32  
+    Foreign.Salsa.CLR, Foreign.Salsa.CLRHost, Foreign.Salsa.Common,
+    Foreign.Salsa.Core, Foreign.Salsa.Resolver, Foreign.Salsa.TypePrelude,
+    Foreign.Salsa.Driver
+
+  Extra-Libraries: oleaut32, ole32
+
+  Extensions: ForeignFunctionInterface
 
