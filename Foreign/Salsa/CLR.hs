@@ -64,7 +64,6 @@ clrHost = unsafePerformIO $ corBindToRuntimeEx
 --  if the type of the resulting function pointer matches that of the method given.
 unsafeGetPointerToMethod :: String -> IO (FunPtr a)
 unsafeGetPointerToMethod methodName = do
-    -- result <- executeInDefaultAppDomain_ICLRRuntimeHost clrHost "Salsa.dll" "Salsa.Driver" "GetPointerToMethod" methodName
     result <- withCWString methodName $ \methodName' -> getPointerToMethodRaw methodName'
     if result == nullFunPtr
         then error $ "Unable to execute Salsa.dll method '" ++ methodName ++ "'."
