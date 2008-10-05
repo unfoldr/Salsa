@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Reflection;
-using System.Query;
+using System.Linq;
 
 namespace Generator
 {
@@ -215,7 +215,7 @@ namespace Generator
             {
                 // Explicitly request all supertypes too (since their members are inherited 
                 // by the requested types)
-                foreach (Type requestedType in Sequence.ToList(_requestedTypes))
+                foreach (Type requestedType in Enumerable.ToList(_requestedTypes))
                 {
                     foreach (Type superRequestedType in EnumerateAncestors(requestedType))
                     {
@@ -330,7 +330,7 @@ namespace Generator
                     List<MemberInfo> relevantMethods = new List<MemberInfo>();
 
                     // Go down the inheritance tree from object to the target type
-                    foreach (Type implementedType in Sequence.Reverse(EnumerateAncestors(targetType)))
+                    foreach (Type implementedType in Enumerable.Reverse(EnumerateAncestors(targetType)))
                     {
                         foreach (MethodInfo mi in implementedType.GetMethods(
                             BindingFlags.DeclaredOnly | BindingFlags.Public |
@@ -344,7 +344,7 @@ namespace Generator
                             // Ignore methods containing parameters of unsupported types, or an 
                             // unsupported result type
                             if (IsUnsupportedType(mi.ReturnType) ||
-                                Sequence.Any(mi.GetParameters(),
+                                Enumerable.Any(mi.GetParameters(),
                                     delegate(ParameterInfo pi) { return IsUnsupportedType(pi.ParameterType); }))
                                 continue;
 
@@ -361,13 +361,13 @@ namespace Generator
 
                     // Enumerate over the method groups in the relevant instance methods,
                     // generating bindings for each group
-                    foreach (IGrouping<string, MemberInfo> mg in Sequence.GroupBy<MemberInfo, string>(
+                    foreach (IGrouping<string, MemberInfo> mg in Enumerable.GroupBy<MemberInfo, string>(
                         relevantMethods, delegate(MemberInfo mi)
                         {
                             return (((MethodInfo)mi).IsStatic ? "static " : "") + mi.Name;
                         }))
                     {
-                        if (!IsMemberRequested(targetType, Sequence.First(mg).Name)) continue;
+                        if (!IsMemberRequested(targetType, Enumerable.First(mg).Name)) continue;
 
                         w.WriteLine("-- " + mg.Key);
 
@@ -391,7 +391,7 @@ namespace Generator
                     foreach (ConstructorInfo ci in targetType.GetConstructors())
                     {
                         // Ignore methods containing parameters of unsupported types
-                        if (Sequence.Any(ci.GetParameters(),
+                        if (Enumerable.Any(ci.GetParameters(),
                             delegate(ParameterInfo pi) { return IsUnsupportedType(pi.ParameterType); }))
                             continue;
 
@@ -416,7 +416,7 @@ namespace Generator
                         new List<AccessorInfo<PropertyInfo>>();
 
                     // Go down the inheritance tree from object to the target type
-                    foreach (Type implementedType in Sequence.Reverse(EnumerateAncestors(targetType)))
+                    foreach (Type implementedType in Enumerable.Reverse(EnumerateAncestors(targetType)))
                     {
                         foreach (PropertyInfo pi in implementedType.GetProperties(
                             BindingFlags.DeclaredOnly | BindingFlags.Public |
@@ -451,14 +451,14 @@ namespace Generator
                     // Enumerate over the properties and generate attribute bindings for each
                     // pair of get/set accessors
                     foreach (IGrouping<string, AccessorInfo<PropertyInfo>> mg in
-                        Sequence.GroupBy<AccessorInfo<PropertyInfo>, string>(
+                        Enumerable.GroupBy<AccessorInfo<PropertyInfo>, string>(
                             relevantPropertyAccessors,
                             delegate(AccessorInfo<PropertyInfo> ai)
                             {
                                 return (ai.Accessor.IsStatic ? "static " : "") + ai.Owner.Name;
                             }))
                     {
-                        if (!IsMemberRequested(targetType, Sequence.First(mg).Owner.Name)) continue;
+                        if (!IsMemberRequested(targetType, Enumerable.First(mg).Owner.Name)) continue;
 
                         WriteProperty(mg, targetType);
                     }
@@ -473,7 +473,7 @@ namespace Generator
                         new List<AccessorInfo<EventInfo>>();
 
                     // Go down the inheritance tree from object to the target type
-                    foreach (Type implementedType in Sequence.Reverse(EnumerateAncestors(targetType)))
+                    foreach (Type implementedType in Enumerable.Reverse(EnumerateAncestors(targetType)))
                     {
                         foreach (EventInfo ei in implementedType.GetEvents(
                             BindingFlags.DeclaredOnly | BindingFlags.Public |
@@ -505,14 +505,14 @@ namespace Generator
                     // Enumerate over the events and generate attribute bindings for each
                     // pair of add/remove accessors
                     foreach (IGrouping<string, AccessorInfo<EventInfo>> mg in
-                        Sequence.GroupBy<AccessorInfo<EventInfo>, string>(
+                        Enumerable.GroupBy<AccessorInfo<EventInfo>, string>(
                             relevantEventAccessors,
                             delegate(AccessorInfo<EventInfo> ai)
                             {
                                 return (ai.Accessor.IsStatic ? "static " : "") + ai.Owner.Name;
                             }))
                     {
-                        if (!IsMemberRequested(targetType, Sequence.First(mg).Owner.Name)) continue;
+                        if (!IsMemberRequested(targetType, Enumerable.First(mg).Owner.Name)) continue;
 
                         WriteEvent(mg, targetType);
                     }
@@ -526,7 +526,7 @@ namespace Generator
                     List<FieldInfo> relevantFields = new List<FieldInfo>();
 
                     // Go down the inheritance tree from object to the target type
-                    foreach (Type implementedType in Sequence.Reverse(EnumerateAncestors(targetType)))
+                    foreach (Type implementedType in Enumerable.Reverse(EnumerateAncestors(targetType)))
                     {
                         foreach (FieldInfo fi in implementedType.GetFields(
                             BindingFlags.DeclaredOnly | BindingFlags.Public |
@@ -568,7 +568,7 @@ namespace Generator
             supertypes.AddRange(targetType.GetInterfaces());
 
             // Remove any unsupported types from 'supertypes'
-            foreach (Type t in Sequence.ToList(supertypes))
+            foreach (Type t in Enumerable.ToList(supertypes))
             {
                 if (IsUnsupportedType(t))
                     supertypes.Remove(t);
@@ -576,7 +576,7 @@ namespace Generator
 
             w.WriteLine("type instance SupertypesOf {0} = {1}", 
                 ToHaskellType(targetType),
-                Util.JoinSuffix(" ::: ", Sequence.Select<Type, string>(supertypes,
+                Util.JoinSuffix(" ::: ", Enumerable.Select<Type, string>(supertypes,
                     delegate(Type t) { return ToHaskellType(t); }), "TNil"));
 
             foreach (Type supertype in supertypes)
@@ -640,7 +640,7 @@ namespace Generator
 
                 // Generate the base type signature for Haskell implementation of the delegate
                 w.WriteLine("type {0} = {1}", wrapperType,
-                    Util.JoinSuffix(" -> ", Sequence.Select<ParameterInfo, string>(parameters,
+                    Util.JoinSuffix(" -> ", Enumerable.Select<ParameterInfo, string>(parameters,
                         delegate(ParameterInfo pi) { return ToBaseType(pi.ParameterType); }),
                         ToBaseReturnType(GetMemberReturnType(invokerMi))));
 
@@ -659,7 +659,7 @@ namespace Generator
                 // Generate the 'delegate' instance for calling the delegate constructor
                 w.WriteLine("instance Delegate {0} where", target);
                 w.WriteLine("    type DelegateT {0} = {1}", target,
-                    Util.JoinSuffix(" -> ", Sequence.Select<ParameterInfo, string>(parameters,
+                    Util.JoinSuffix(" -> ", Enumerable.Select<ParameterInfo, string>(parameters,
                         delegate(ParameterInfo pi) { return ToHaskellType(pi.ParameterType); }),
                         ToReturnType(GetMemberReturnType(invokerMi))));
                 w.WriteLine("    delegate _ handler = {0} (marshalFn{1} handler) >>= unmarshal",
@@ -676,7 +676,7 @@ namespace Generator
         /// </summary>
         private void WriteMethodGroup(IEnumerable<MemberInfo> members, Type forType)
         {
-            MemberInfo firstMi = Sequence.First(members);
+            MemberInfo firstMi = Enumerable.First(members);
 
             Console.WriteLine("  {0}", firstMi.Name);
 
@@ -689,8 +689,8 @@ namespace Generator
 
             // Output the parameter lists for the members of the method group
             w.WriteLine("type instance Candidates {0} {1} = {2}",
-                target, label, 
-                Util.JoinSuffix(" ::: ", Sequence.Select<MemberInfo,string>(members,
+                target, label,
+                Util.JoinSuffix(" ::: ", Enumerable.Select<MemberInfo, string>(members,
                     delegate(MemberInfo mi) { return ToListType(GetParameters(mi)); }), "TNil"));
 
             // Output instances for invoking each method group member
@@ -707,14 +707,14 @@ namespace Generator
         /// </summary>
         private void WriteConstructorGroup(IEnumerable<ConstructorInfo> members, Type forType)
         {
-            ConstructorInfo firstCi = Sequence.First(members);
+            ConstructorInfo firstCi = Enumerable.First(members);
             string target = TypeToLabel(forType);
             string label = "Ctor";
 
             // Output the parameter lists for the constructors
             w.WriteLine("type instance Candidates {0} {1} = {2}",
                 target, label,
-                Util.JoinSuffix(" ::: ", Sequence.Select<ConstructorInfo, string>(members,
+                Util.JoinSuffix(" ::: ", Enumerable.Select<ConstructorInfo, string>(members,
                     delegate(ConstructorInfo ci) { return ToListType(ci.GetParameters()); }), "TNil"));
 
             // Output instances for invoking each constructor
@@ -795,7 +795,7 @@ namespace Generator
                 mi.DeclaringType.Name, mi.Name);
             w.WriteLine("type {0} = {1}{2}", stubType,
                 IsMemberStatic(mi) ? "" : (ToBaseType(mi.DeclaringType) + " -> "),
-                Util.JoinSuffix(" -> ", Sequence.Select<ParameterInfo, string>(GetParameters(mi),
+                Util.JoinSuffix(" -> ", Enumerable.Select<ParameterInfo, string>(GetParameters(mi),
                     delegate(ParameterInfo pi) { return ToBaseType(pi.ParameterType); }),
                     ToBaseReturnType(GetMemberReturnType(mi))));
             w.WriteLine("foreign import stdcall \"dynamic\" {0} :: FunPtr {1} -> {1}",
@@ -806,7 +806,7 @@ namespace Generator
             w.WriteLine("{0} = {1} $ unsafePerformIO $ getMethodStub", stubFunction, makeFunction);
             w.WriteLine("    \"{0}\" \"{1}\"", mi.DeclaringType.AssemblyQualifiedName, mi.Name);
             w.WriteLine("    \"{0}\"",
-                Util.Join(";", Sequence.Select<ParameterInfo, string>(GetParameters(mi),
+                Util.Join(";", Enumerable.Select<ParameterInfo, string>(GetParameters(mi),
                     delegate(ParameterInfo pi) { return ToQualifiedType(pi.ParameterType); })));
             w.WriteLine();
         }
@@ -843,7 +843,7 @@ namespace Generator
 
         private void WriteProperty(IEnumerable<AccessorInfo<PropertyInfo>> accessors, Type forType)
         {
-            AccessorInfo<PropertyInfo> firstAccessor = Sequence.First(accessors);
+            AccessorInfo<PropertyInfo> firstAccessor = Enumerable.First(accessors);
             bool isStatic = IsMemberStatic(firstAccessor.Accessor);
 
             string target = isStatic ? TypeToLabel(forType) : ToHaskellType(forType);
@@ -851,9 +851,9 @@ namespace Generator
 
             w.WriteLine("instance Prop {0} {1} where", target, label);
 
-            AccessorInfo<PropertyInfo> getAccessor = Sequence.FirstOrDefault(accessors,
+            AccessorInfo<PropertyInfo> getAccessor = Enumerable.FirstOrDefault(accessors,
                 delegate(AccessorInfo<PropertyInfo> ai) { return ai.Type == AccessorType.Get; });
-            AccessorInfo<PropertyInfo> setAccessor = Sequence.FirstOrDefault(accessors,
+            AccessorInfo<PropertyInfo> setAccessor = Enumerable.FirstOrDefault(accessors,
                 delegate(AccessorInfo<PropertyInfo> ai) { return ai.Type == AccessorType.Set; });
 
             if (getAccessor != null)
@@ -892,7 +892,7 @@ namespace Generator
 
         private void WriteEvent(IEnumerable<AccessorInfo<EventInfo>> accessors, Type forType)
         {
-            AccessorInfo<EventInfo> firstAccessor = Sequence.First(accessors);
+            AccessorInfo<EventInfo> firstAccessor = Enumerable.First(accessors);
             bool isStatic = IsMemberStatic(firstAccessor.Accessor);
 
             string target = isStatic ? TypeToLabel(forType) : ToHaskellType(forType);
@@ -1042,7 +1042,7 @@ namespace Generator
         /// </summary>
         private string ToTupleType(ParameterInfo[] ts)
         {
-            return "(" + Util.Join(", ", Sequence.Select<ParameterInfo, string>(ts,
+            return "(" + Util.Join(", ", Enumerable.Select<ParameterInfo, string>(ts,
                 delegate(ParameterInfo pi) { return ToHaskellType(pi.ParameterType); } )) + ")";
         }
 
@@ -1052,7 +1052,7 @@ namespace Generator
         /// </summary>
         private string ToListType(ParameterInfo[] ts)
         {
-            return "(" + Util.JoinSuffix(" ::: ", Sequence.Select<ParameterInfo, string>(ts,
+            return "(" + Util.JoinSuffix(" ::: ", Enumerable.Select<ParameterInfo, string>(ts,
                 delegate(ParameterInfo pi) { return ToHaskellType(pi.ParameterType); } ), "TNil") + ")";
         }
 
@@ -1065,7 +1065,7 @@ namespace Generator
         {
             string parameterDetails = "";
             if (mi is ConstructorInfo || mi is MethodInfo)
-                parameterDetails = Util.Join(" ", Sequence.Select<ParameterInfo, string>(GetParameters(mi),
+                parameterDetails = Util.Join(" ", Enumerable.Select<ParameterInfo, string>(GetParameters(mi),
                         delegate(ParameterInfo pi) { return pi.ParameterType.AssemblyQualifiedName; }));
 
             return string.Format("stub_{0}",
