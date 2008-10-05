@@ -75,6 +75,11 @@ foreign import stdcall "dynamic" makeCorBindToRuntimeEx :: FunPtr CorBindToRunti
 
 -- | 'start_ICorRuntimeHost' calls the Start method of the given ICorRuntimeHost interface.
 start_ICorRuntimeHost this = do
+    -- Initialise COM (and the threading model)
+    coInitializeEx nullPtr coInit_ApartmentThreaded
+    -- TODO: Allow the library user to select their desired threading model
+    --       (we use an STA for the time being so we can use GUI libraries).
+
     f <- getInterfaceFunction 10 makeStart this
     f this >>= checkHR "ICorRuntimeHost.Start"
 
@@ -86,6 +91,8 @@ foreign import stdcall "dynamic" makeStart :: FunPtr Start -> Start
 stop_ICorRuntimeHost this = do
     f <- getInterfaceFunction 11 makeStop this
     f this >>= checkHR "ICorRuntimeHost.Stop"
+
+    coUninitialize
 
 type Stop = ICorRuntimeHost -> IO HResult
 foreign import stdcall "dynamic" makeStop :: FunPtr Stop -> Stop
@@ -267,6 +274,12 @@ getInterfaceFunction index makeFun this = do
     -- Cast the function pointer to the expected type, and import it as a Haskell function
     return $ makeFun $ castFunPtr funPtr
 
+
+foreign import stdcall "CoInitializeEx" coInitializeEx :: Ptr () -> Int32 -> IO HResult
+foreign import stdcall "CoUninitialize" coUninitialize :: IO ()
+
+coInit_MultiThreaded     = 0 :: Int32
+coInit_ApartmentThreaded = 2 :: Int32
 
 data Guid = Guid Word32 Word16 Word16 Word8 Word8 Word8 Word8 Word8 Word8 Word8 Word8 
     deriving (Show, Eq)
