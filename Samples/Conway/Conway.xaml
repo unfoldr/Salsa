@@ -1,0 +1,59 @@
+<Window 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Game of Life" Width="424" Height="310">
+
+  <Window.Resources>
+    <LinearGradientBrush x:Key="alive">
+      <GradientStop Color="White" Offset="0.0" />
+      <GradientStop Color="Black" Offset="1.0" />
+    </LinearGradientBrush>
+    <RadialGradientBrush x:Key="dead">
+      <GradientStop Color="Transparent" Offset="0.0" />
+      <GradientStop Color="White"       Offset="0.1" />
+      <GradientStop Color="Transparent" Offset="0.1" />
+    </RadialGradientBrush>
+  </Window.Resources>
+
+  <Window.Background>
+    <LinearGradientBrush>
+      <GradientStop Color="White" Offset="0.0" />
+      <GradientStop Color="Gray" Offset="1.0" />
+    </LinearGradientBrush>
+  </Window.Background>
+
+  <DockPanel Margin="2">
+    <DockPanel DockPanel.Dock="Bottom" Margin="2" LastChildFill="False">
+      <ToggleButton Name="runButton" DockPanel.Dock="Left" Width="60"
+                    Margin="0,0,4,0" FontWeight="Bold">_Run!</ToggleButton>
+      <Button Name="clearButton" DockPanel.Dock="Left" Width="60">_Clear</Button>
+      <Button Name="exitButton" DockPanel.Dock="Right" Width="60">E_xit</Button>
+    </DockPanel>
+    <UniformGrid x:Name="grid" Margin="2">
+      <UniformGrid.Resources>
+        <Style TargetType="{x:Type ToggleButton}">
+          <Style.Triggers>
+            <Trigger Property="ToggleButton.IsChecked" Value="True">
+              <Setter Property="Background" Value="White" />
+              <Setter Property="Foreground" Value="{StaticResource alive}" />
+            </Trigger>
+          </Style.Triggers>
+          <Setter Property="Foreground" Value="Transparent" />
+          <Setter Property="Background" Value="{StaticResource dead}" />
+          <Setter Property="Template">
+            <Setter.Value>
+              <ControlTemplate>
+                <Rectangle Fill="{TemplateBinding Background}"
+                           Stroke="{TemplateBinding Foreground}"
+                           RadiusX="2" RadiusY="2"
+                           Margin="1" />
+              </ControlTemplate>
+            </Setter.Value>
+          </Setter>
+        </Style>
+      </UniformGrid.Resources>
+      <!-- Insert ToggleButton's in Haskell code -->
+    </UniformGrid>
+  </DockPanel>
+</Window>
+<!-- vim:set ts=2 sw=2 expandtab syntax=xml: -->

@@ -1,0 +1,49 @@
+reference C:\Windows\Microsoft.NET\Framework\v2.0.50727\System.dll
+reference C:\Program Files\Reference Assemblies\Microsoft\Framework\v3.0\PresentationCore.dll
+reference C:\Program Files\Reference Assemblies\Microsoft\Framework\v3.0\PresentationFramework.dll 
+reference C:\Program Files\Reference Assemblies\Microsoft\Framework\v3.0\WindowsBase.dll
+
+System.Windows.Controls.Primitives.ToggleButton: IsChecked
+
+System.Windows.Threading.DispatcherTimer: Tick, Interval, Start, Stop, IsEnabled
+
+System.Uri
+System.UriKind: *
+System.Windows.Markup.XamlReader: LoadAsync
+System.Windows.Resources.StreamResourceInfo: Stream 
+
+System.Windows.Media.Pen
+System.Windows.Point
+System.Windows.Media.GeometryGroup: Children
+System.Windows.Media.Geometry
+System.Windows.Media.LineGeometry
+System.Windows.Media.EllipseGeometry: RadiusX, RadiusY
+System.Windows.Media.GeometryCollection: Add, Clear
+System.Windows.Media.RectangleGeometry
+System.Windows.Media.CombinedGeometry: GeometryCombineMode
+System.Windows.Media.GeometryDrawing: Geometry, Brush, Pen
+System.Windows.Media.DrawingImage: Freeze
+System.Windows.Controls.Image: Source, Stretch
+System.Windows.Media.Stretch: None
+System.Windows.Media.GeometryCombineMode: *
+System.Windows.Application: Run, GetRemoteStream
+System.Windows.Window: Title, Top, Close
+System.Windows.Controls.Button: Click
+System.Windows.Controls.Primitives.ToggleButton: Click
+System.Windows.Controls.ContentControl: Content
+System.Windows.Controls.StackPanel
+System.Windows.Controls.Primitives.UniformGrid: Columns
+System.Windows.Controls.Panel: Children
+System.Windows.Controls.UIElementCollection: Add
+System.Windows.Duration
+System.TimeSpan: FromSeconds
+System.Windows.Media.Colors: Red, Black
+System.Windows.Media.Brushes: Red, Black, Green
+System.Windows.Media.SolidColorBrush: ColorProperty
+System.Windows.Media.Animation.ColorAnimation
+System.Windows.Media.Animation.RepeatBehavior: Forever
+System.Windows.Media.Animation.Animatable: BeginAnimation
+System.Windows.Media.Animation.Timeline: AutoReverse, RepeatBehavior
+System.Windows.FrameworkElement: Width, Height, FindName
+System.Windows.Controls.Control: BackgroundProperty, Background
+System.Windows.RoutedEventHandler
