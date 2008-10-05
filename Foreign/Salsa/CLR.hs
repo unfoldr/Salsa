@@ -1,16 +1,16 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
 -----------------------------------------------------------------------------
 -- |
--- Module      : Salsa.CLR
--- Copyright   : (c) 2007 Andrew Appleyard
--- Licence     : BSD-style (see LICENSE.txt)
+-- Module      : Foreign.Salsa.CLR
+-- Copyright   : (c) 2007-2008 Andrew Appleyard
+-- Licence     : BSD-style (see LICENSE)
 -- 
 -- Provides convenient functions for accessing the CLR, including: loading
 -- the CLR into the process, releasing .NET object references, and obtaining
 -- dynamically-generated stub functions for calling into .NET from Haskell.
 --
 -----------------------------------------------------------------------------
-module Salsa.CLR (
+module Foreign.Salsa.CLR (
     withCLR,
     startCLR, stopCLR,
     ObjectId,
@@ -26,7 +26,7 @@ import Data.Int
 import Foreign hiding (new, newForeignPtr)
 import Foreign.C.String
 
-import Salsa.CLRHost
+import Foreign.Salsa.CLRHost
 
 -- | Identifies a foreign (.NET) object instance
 type ObjectId = Int32

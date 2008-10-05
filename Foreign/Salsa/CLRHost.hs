@@ -1,9 +1,9 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
 -----------------------------------------------------------------------------
 -- |
--- Module      : Salsa.CLRHost
--- Copyright   : (c) 2007 Andrew Appleyard
--- Licence     : BSD-style (see LICENSE.txt)
+-- Module      : Foreign.Salsa.CLRHost
+-- Copyright   : (c) 2007-2008 Andrew Appleyard
+-- Licence     : BSD-style (see LICENSE)
 -- 
 -- Exposes some of the methods of the ICLRRuntimeHost COM interface, which
 -- can be used to host the the Microsoft CLR in the process, and to execute
@@ -11,7 +11,7 @@
 -- with the Microsoft COM.
 --
 -----------------------------------------------------------------------------
-module Salsa.CLRHost (
+module Foreign.Salsa.CLRHost (
     corBindToRuntimeEx,
     start_ICorRuntimeHost,
     stop_ICorRuntimeHost,
@@ -33,7 +33,7 @@ import System.IO.Unsafe (unsafePerformIO)
 import qualified Data.ByteString as S
 import Text.Printf
 
-import Salsa.Driver
+import Foreign.Salsa.Driver
 
 --
 -- Global static functions for hosting the CLR

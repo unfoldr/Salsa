@@ -4,12 +4,12 @@
 {-# OPTIONS_GHC -fallow-undecidable-instances #-}
 -----------------------------------------------------------------------------
 -- |
--- Module      : Salsa.Core
--- Copyright   : (c) 2007 Andrew Appleyard
--- Licence     : BSD-style (see LICENSE.txt)
+-- Module      : Foreign.Salsa.Core
+-- Copyright   : (c) 2007-2008 Andrew Appleyard
+-- Licence     : BSD-style (see LICENSE)
 -- 
 -----------------------------------------------------------------------------
-module Salsa.Core where
+module Foreign.Salsa.Core where
 
 import Unsafe.Coerce (unsafeCoerce)
 import Foreign.C.String
@@ -18,10 +18,10 @@ import System.Win32
 import Foreign hiding (new, newForeignPtr)
 import Foreign.Concurrent (newForeignPtr)
 
-import Salsa.Common
-import Salsa.TypePrelude
-import Salsa.Resolver
-import Salsa.CLR
+import Foreign.Salsa.Common
+import Foreign.Salsa.TypePrelude
+import Foreign.Salsa.Resolver
+import Foreign.Salsa.CLR
 
 -- Reverse function application
 x # f = f x

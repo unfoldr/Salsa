@@ -1,28 +1,28 @@
 {-# LANGUAGE ForeignFunctionInterface, TypeSynonymInstances, ScopedTypeVariables #-}
 -----------------------------------------------------------------------------
 -- |
--- Module      : Salsa.Binding
--- Copyright   : (c) 2007 Andrew Appleyard
--- Licence     : BSD-style (see LICENSE.txt)
+-- Module      : Foreign.Salsa.Binding
+-- Copyright   : (c) 2007-2008 Andrew Appleyard
+-- Licence     : BSD-style (see LICENSE)
 -- 
 -- Exports data types and functions required by the generated binding files.
 --
 -----------------------------------------------------------------------------
-module Salsa.Binding (
-    module Salsa.Common,
-    module Salsa.Core,
-    module Salsa.CLR,
-    module Salsa.TypePrelude,
-    module Salsa.Resolver,
+module Foreign.Salsa.Binding (
+    module Foreign.Salsa.Common,
+    module Foreign.Salsa.Core,
+    module Foreign.Salsa.CLR,
+    module Foreign.Salsa.TypePrelude,
+    module Foreign.Salsa.Resolver,
     withCWString, CWString, FunPtr, unsafePerformIO, liftM,
     type_GetType
     ) where
 
-import Salsa.Common
-import Salsa.Core
-import Salsa.CLR
-import Salsa.TypePrelude
-import Salsa.Resolver
+import Foreign.Salsa.Common
+import Foreign.Salsa.Core
+import Foreign.Salsa.CLR
+import Foreign.Salsa.TypePrelude
+import Foreign.Salsa.Resolver
 
 import Foreign hiding (new)
 import Foreign.C.String

@@ -241,7 +241,7 @@ namespace Generator
                 w.WriteLine("  ) where");
                 w.WriteLine();
                 w.WriteLine("import Labels");
-                w.WriteLine("import Salsa.Binding");
+                w.WriteLine("import Foreign.Salsa.Binding");
 
                 while (_requiredTypes.Count > 0)
                 {
@@ -263,7 +263,7 @@ namespace Generator
             using (w = File.CreateText(Path.Combine(outputPath, "Labels.hs")))
             {
                 w.WriteLine("module Labels where");
-                w.WriteLine("import Salsa (invoke)");
+                w.WriteLine("import Foreign.Salsa (invoke)");
                 w.WriteLine();
                 WriteLabels();
                 WriteInvokers();

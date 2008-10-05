@@ -4,7 +4,7 @@ module Main where
 -- Displays 'Hello .NET World!' using .NET's Console.WriteLine() method.
 --
 
-import Salsa
+import Foreign.Salsa
 import Bindings
 
 main :: IO ()

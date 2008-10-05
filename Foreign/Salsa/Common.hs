@@ -1,15 +1,15 @@
 {-# LANGUAGE EmptyDataDecls #-}
 -----------------------------------------------------------------------------
 -- |
--- Module      : Salsa.Common
--- Copyright   : (c) 2007 Andrew Appleyard
--- Licence     : BSD-style (see LICENSE.txt)
+-- Module      : Foreign.Salsa.Common
+-- Copyright   : (c) 2007-2008 Andrew Appleyard
+-- Licence     : BSD-style (see LICENSE)
 -- 
 -- Exports data types and functions that are used throughout the bridge
 -- implementation.
 --
 -----------------------------------------------------------------------------
-module Salsa.Common (
+module Foreign.Salsa.Common (
     Obj(..),          _Obj,
     Null,
     Object_(..),      _Object,
@@ -22,8 +22,8 @@ module Salsa.Common (
 
 import Foreign hiding (new, newForeignPtr)
 
-import Salsa.TypePrelude
-import Salsa.CLR
+import Foreign.Salsa.TypePrelude
+import Foreign.Salsa.CLR
 
 -- | @Obj a@ represents a .NET object instance of type @a@.
 data Obj a = Obj !ObjectId !(ForeignPtr ()) 

@@ -2,19 +2,19 @@
 {-# OPTIONS_GHC -fallow-undecidable-instances #-}
 -----------------------------------------------------------------------------
 -- |
--- Module      : Resolver
--- Copyright   : (c) 2007 Andrew Appleyard
--- Licence     : BSD-style (see LICENSE.txt)
+-- Module      : Foreign.Salsa.Resolver
+-- Copyright   : (c) 2007-2008 Andrew Appleyard
+-- Licence     : BSD-style (see LICENSE)
 -- 
 -- Contains a type-level implementation of the C# function member overload
 -- resolution algorithm, as described in the \"C# Language Specification\"
 -- (particularly, section 7.4.2).
 --
 -----------------------------------------------------------------------------
-module Salsa.Resolver where
+module Foreign.Salsa.Resolver where
 
-import Salsa.Common
-import Salsa.TypePrelude
+import Foreign.Salsa.Common
+import Foreign.Salsa.TypePrelude
 
 --
 -- Basic predicates

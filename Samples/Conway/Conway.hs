@@ -1,7 +1,7 @@
 {-# LANGUAGE PatternSignatures, FlexibleContexts #-}
 module Main where
 
-import Salsa
+import Foreign.Salsa
 import Bindings
 
 import Control.Monad

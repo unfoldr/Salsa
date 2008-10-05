@@ -1,13 +1,13 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      : Salsa
--- Copyright   : (c) 2007 Andrew Appleyard
--- Licence     : BSD-style (see LICENSE.txt)
+-- Copyright   : (c) 2007-2008 Andrew Appleyard
+-- Licence     : BSD-style (see LICENSE)
 -- 
 -- Salsa: a .NET bridge for Haskell.
 --
 -----------------------------------------------------------------------------
-module Salsa (
+module Foreign.Salsa (
     Obj, _Obj,
     null_, isNull,
     ( # ), (>>=#),
@@ -23,8 +23,8 @@ module Salsa (
     String_,     _String
     ) where
 
-import Salsa.Core
-import Salsa.Common
-import Salsa.CLR
+import Foreign.Salsa.Core
+import Foreign.Salsa.Common
+import Foreign.Salsa.CLR
 
 -- vim:set sw=4 ts=4 expandtab:

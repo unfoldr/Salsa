@@ -2,15 +2,15 @@
 {-# OPTIONS_GHC -fallow-undecidable-instances #-}
 -----------------------------------------------------------------------------
 -- |
--- Module      : Salsa.TypePrelude
--- Copyright   : (c) 2007 Andrew Appleyard
--- Licence     : BSD-style (see LICENSE.txt)
+-- Module      : Foreign.Salsa.TypePrelude
+-- Copyright   : (c) 2007-2008 Andrew Appleyard
+-- Licence     : BSD-style (see LICENSE)
 -- 
 -- Type-level implementations of some standard boolean and list functions.
 -- Including short-circuited 'and' and 'or' logic functions.
 --
 -----------------------------------------------------------------------------
-module Salsa.TypePrelude where
+module Foreign.Salsa.TypePrelude where
 
 --
 -- Type-level booleans and boolean operations:
