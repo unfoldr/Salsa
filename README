@@ -1,37 +1,70 @@
-Salsa: a .NET bridge for Haskell
---------------------------------
 
-Foreign\Salsa: the Foreign.Salsa library.
+                      Salsa: a .NET bridge for Haskell
+                     
+  Salsa is an experimental Haskell library and code generator that allows
+  Haskell programs to host the .NET runtime and interact with .NET libraries.
+  It uses type families extensively to provide a type-safe mapping of the .NET
+  object model in the Haskell type system.
 
-  Exposes the Haskell-side interface to Salsa, including: functions to load the
-  .NET runtime into the process, functions for interactive with .NET classes
-  and objects, and the required type-level machinery.
+What's in the package:
 
-Driver: the Salsa .NET driver assembly (Salsa.dll).
+  * 'Foreign' contains the Haskell library 'Foreign.Salsa'.  
 
-  Contains the .NET code that is loaded by the Salsa library to call in and out
-  of the .NET runtime.  The assembly binary (Salsa.dll) is embedded in
-  Foreign\Salsa\Driver.hs with Embed.hs.
+    This library provides the Haskell-side interface to Salsa, including:
+    functions to load the .NET runtime into the process, functions for
+    interacting with .NET classes and objects, and the required type-level
+    machinery.  It works together with the Haskell modules created by the
+    generator (see below) to provide access to .NET classes and their members.
 
-Generator: the Salsa binding generator.
+  * 'Driver' contains the Salsa .NET driver assembly (Salsa.dll).
 
-  A C# program that generates Haskell files from .NET metadata to provide
-  type-safe access to the requested .NET classes and methods in .NET
-  assembilies.
+    The driver assembly contains .NET code that is loaded automatically by the
+    Salsa library when the .NET runtime is loaded into the process.  It
+    provides run-time code generation facilities for calling in and out of the
+    .NET runtime from Haskell.  The assembly binary (Salsa.dll) is embedded in
+    'Foreign\Salsa\Driver.hs' using the 'Embed.hs' utility program.
+
+  * 'Generator' contains the Salsa binding generator.
+
+    The generator is a C# program that creates Haskell modules from .NET
+    metadata to provide type-safe access to the requested .NET classes and
+    methods in .NET assembilies.
+    
+    Note: the generator requires .NET 3.5 because it uses the 'System.Linq'
+          namespace.
+
+  * 'Samples' contains a couple of Haskell programs that use Salsa.
+
+    - Hello:  a basic console 'Hello World' program.
+
+    - Conway: a simulator for Conway's Game of Life with a Windows Presentation
+              Foundation GUI.  (Requires .NET 3.0 or later.)
+
+Requirements:
+
+  * GHC 6.8
   
-  Note: this requires .NET 3.5 because it uses the System.Linq namespace.
+    Salsa makes extensive use of type families and thus requires at least
+    version 6.8 of GHC.
 
-Samples\
+  * Microsoft .NET Framework 2.0 (or greater)
 
-  Some sample programs that use the Salsa library.  Just run 'msbuild' in
-  the sample's directory to build it.
+    Salsa will not work with versions 1.0/1.1 of the .NET Framework, or with
+    Mono.  (Supporting Mono shouldn't be too much work though.)
 
-  Hello      - Hello World sample (requires .NET 2.0 or later).
+Building:
 
-  Conway     - Simulator for Conway's Game of Life.  Uses the Windows
-               Presentation Foundation library in .NET 3.0 for the GUI
-               (requires .NET 3.0 or later).
+  Build the Salsa library using Cabal (version 1.2) as usual:
 
+    runhaskell Setup.hs configure
+    runhaskell Setup.hs build
+    runhaskell Setup.hs install
 
---
-Andrew Appleyard <andrew.appleyard@gmail.com>
+  The generator, driver, and each of the samples can be built with MSBuild;
+  just run 'msbuild' in the appropriate directory.  (The msbuild binary can be
+  found in '%WINDIR%\Microsoft.NET\Framework\v2.0.50272').
+
+Author:
+
+  Andrew Appleyard
+
