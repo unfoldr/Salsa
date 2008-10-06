@@ -12,15 +12,15 @@ Description:
   It uses type families extensively to provide a type-safe mapping of the .NET
   object model in the Haskell type system.
 
-License:        BSD3
-License-File:   LICENSE
 Author:         Andrew Appleyard
-Maintainer:     Andrew Appleyard <andrew.appleyard@gmail.com>
+Maintainer:     andrew.appleyard@gmail.com
 Homepage:       http://haskell.org/haskellwiki/Salsa
 
+License:        BSD3
+License-File:   LICENSE
 Copyright:      (c) 2007-2008 Andrew Appleyard
-Stability:      Experimental
 
+Stability:      Experimental
 Tested-With:    GHC==6.8.3
 
 Extra-Source-Files:
