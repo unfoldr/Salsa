@@ -41,6 +41,10 @@ Extra-Source-Files:
   Samples/Hello/Hello.hs
   Samples/Hello/Hello.imports
 
+  Samples/Weather/Weather.proj
+  Samples/Weather/Weather.hs
+  Samples/Weather/Weather.imports
+
   Samples/Conway/Conway.proj
   Samples/Conway/Conway.hs
   Samples/Conway/Conway.imports
