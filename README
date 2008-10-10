@@ -33,12 +33,15 @@ What's in the package:
     Note: the generator requires .NET 3.5 because it uses the 'System.Linq'
           namespace.
 
-  * 'Samples' contains a couple of Haskell programs that use Salsa.
+  * 'Samples' contains a few Haskell programs that use Salsa.
 
-    - Hello:  a basic console 'Hello World' program.
+    - Hello:   a basic console 'Hello World' program.
 
-    - Conway: a simulator for Conway's Game of Life with a Windows Presentation
-              Foundation GUI.  (Requires .NET 3.0 or later.)
+    - Weather: a console program that asynchronously downloads the Sydney
+               weather forecast and displays it.
+
+    - Conway:  a simulator for Conway's Game of Life with a Windows
+               Presentation Foundation GUI.  (Requires .NET 3.0 or later.)
 
 Requirements:
 
