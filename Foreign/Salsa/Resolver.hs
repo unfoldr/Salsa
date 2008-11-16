@@ -207,10 +207,10 @@ type instance  ConvertsTo t1 t2 =
     (TOr  (TAnd (IsPrim t1)           (TyEq t2 (Obj Object_)))
     (TOr  (TAnd (TyEq t1 Int32)       (TyEq t2 Double))
     (TOr  (TAnd (TyEq t1 (Obj Null))  (IsRef t2))
-    (TOr  (TAnd (TAnd (IsArr t1) (IsArr t2))
-                (IsSubtypeOf' (ArrElemTy t1) (ArrElemTy t2)))
+--    (TOr  (TAnd (TAnd (IsArr t1) (IsArr t2))
+--                (IsSubtypeOf' (ArrElemTy t1) (ArrElemTy t2)))
           (TAnd (TAnd (IsRef t1) (IsRef t2))
-                (IsSubtypeOf t1 t2)))))))
+                (IsSubtypeOf t1 t2)))))) -- )
 
 
 --    (TOr5 (TyEq t1 t2)
