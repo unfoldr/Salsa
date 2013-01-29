@@ -1,5 +1,5 @@
 {-# LANGUAGE TypeFamilies, MultiParamTypeClasses, EmptyDataDecls, TypeOperators #-}
-{-# OPTIONS_GHC -fallow-undecidable-instances #-}
+{-# LANGUAGE UndecidableInstances #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      : Foreign.Salsa.Resolver
