@@ -1,4 +1,5 @@
-{-# LANGUAGE ForeignFunctionInterface, TypeSynonymInstances, ScopedTypeVariables #-}
+{-# LANGUAGE ForeignFunctionInterface, TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances, ScopedTypeVariables #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      : Foreign.Salsa.Binding
@@ -24,7 +25,8 @@ import Foreign.Salsa.CLR
 import Foreign.Salsa.TypePrelude
 import Foreign.Salsa.Resolver
 
-import Foreign hiding (new)
+import System.IO.Unsafe ( unsafePerformIO )
+import Foreign hiding (new, unsafePerformIO)
 import Foreign.C.String
 
 import Control.Monad (liftM)

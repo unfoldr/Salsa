@@ -1,7 +1,7 @@
-{-# LANGUAGE TypeFamilies, MultiParamTypeClasses, EmptyDataDecls #-}
+{-# LANGUAGE GADTs, TypeFamilies, MultiParamTypeClasses, EmptyDataDecls #-}
 {-# LANGUAGE ExistentialQuantification, FlexibleContexts, TypeOperators #-}
 {-# LANGUAGE ScopedTypeVariables, TypeSynonymInstances, FlexibleInstances #-}
-{-# OPTIONS_GHC -fallow-undecidable-instances #-}
+{-# LANGUAGE UndecidableInstances #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      : Foreign.Salsa.Core
@@ -12,10 +12,11 @@
 module Foreign.Salsa.Core where
 
 import Unsafe.Coerce (unsafeCoerce)
+import System.IO.Unsafe ( unsafePerformIO )
 import Foreign.C.String
 import System.Win32
 
-import Foreign hiding (new, newForeignPtr)
+import Foreign hiding (new, newForeignPtr, unsafePerformIO)
 import Foreign.Concurrent (newForeignPtr)
 
 import Foreign.Salsa.Common
@@ -437,10 +438,20 @@ marshalFn4 f = \a1' a2' a3' a4' ->
     unmarshal a1' >>= (\a1 -> unmarshal a2' >>= (\a2 -> unmarshal a3' >>= (\a3 ->
     unmarshal a4' >>= (\a4 -> (f a1 a2 a3 a4 >>= flip marshal return)))))
 
-marshalFn5 f = \a1' a2' a3' a4' a5' -> 
-    unmarshal a1' >>= (\a1 -> unmarshal a2' >>= (\a2 -> unmarshal a3' >>= (\a3 ->
+marshalFn5 f = \a1' a2' a3' a4' a5' -> do
+    a1 <- unmarshal a1'
+    a2 <- unmarshal a2'
+    a3 <- unmarshal a3'
+    a4 <- unmarshal a4'
+    a5 <- unmarshal a5'
+    v <- f a1 a2 a3 a4 a5
+    return $ marshal v
+    {- 
+    >>= (\a1 -> unmarshal a2' >>= (\a2 -> unmarshal a3' >>= (\a3 ->
     unmarshal a4' >>= (\a4 -> unmarshal a5' >>= (\a5 ->
     (f a1 a2 a3 a5 a5 >>= flip marshal return))))))
+    -}
+
 -- ...
 
 -- vim:set sw=4 ts=4 expandtab:

@@ -1,5 +1,5 @@
 {-# LANGUAGE TypeFamilies, TypeOperators, EmptyDataDecls #-}
-{-# OPTIONS_GHC -fallow-undecidable-instances #-}
+{-# LANGUAGE UndecidableInstances #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      : Foreign.Salsa.TypePrelude

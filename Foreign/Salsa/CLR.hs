@@ -23,7 +23,8 @@ module Foreign.Salsa.CLR (
     ) where
 
 import Data.Int
-import Foreign hiding (new, newForeignPtr)
+import System.IO.Unsafe ( unsafePerformIO )
+import Foreign hiding ( new, newForeignPtr, unsafePerformIO )
 import Foreign.C.String
 
 import Foreign.Salsa.CLRHost
